@@ -18,6 +18,7 @@ FROM (
 			on sub.myc_vanid = b.vanid
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
 			on rep.days = CURRENT_DATE 
+		WHERE b.foname IS NOT NULL
 		GROUP BY 1,2,3
 UNION
 -- Lapsed Hosts
@@ -48,6 +49,7 @@ UNION
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
 			on rep.days = CURRENT_DATE 
 		WHERE sub2.myc_vanid IS NULL
+			AND  b.foname IS NOT NULL
 		GROUP BY 1,2,3
 UNION
 --Walk Attempts	
@@ -82,6 +84,7 @@ UNION
 			on sub.myc_vanid = b.vanid
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
 			on rep.days = CURRENT_DATE 
+		WHERE b.foname IS NOT NULL
 		GROUP BY 1,2,3
 Union
 -- Lapsed Vols
@@ -110,6 +113,7 @@ Union
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
 			on rep.days = CURRENT_DATE 
 		WHERE sub2.myc_vanid IS NULL
+			AND b.foname IS NOT NULL
 		GROUP BY 1,2,3		
 UNION 
 --Vol Rec Calls	
@@ -125,6 +129,7 @@ UNION
 	WHERE con.committeeid = 59691
 		AND YEAR (con.datecanvassed) = 2018
 		AND con.call_attempt = 1
+		AND b.foname IS NOT NULL
 	GROUP BY 1,2,3,4
 UNION
 --Vol Rec Contacts	
@@ -141,6 +146,7 @@ UNION
 		AND YEAR (con.datecanvassed) = 2018
 		AND con.successful_contact = 1
 		AND con.call_attempt = 1
+		AND b.foname IS NOT NULL
 	GROUP BY 1,2,3,4	
 UNION
 -- Shifts Scheduled By Week
@@ -156,6 +162,7 @@ UNION
 	WHERE a.RSVP_date > CURRENT_DATE - INTERVAL '30 Days'
 		AND a.committeeid = 59691
 		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training', 'Meeting')
+		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4
 UNION	
 -- Shifts Scheduled Yesterday
@@ -171,6 +178,7 @@ UNION
 	WHERE a.RSVP_date = CURRENT_DATE - INTERVAL '1 Days'
 		AND a.committeeid = 59691
 		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training','Meeting')
+		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4	
 UNION	
 -- Upcoming Shifts
@@ -187,8 +195,27 @@ UNION
 		AND a.committeeid = 59691
 		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training','Meeting')
         AND a.RSVP IS NOT NULL
+        AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4	
 UNION 
+--Shifts Coming In Today
+	SELECT c.regionname, c.foname, 
+		DATE (rep.reporting_week) as 'Reporting Week',
+		CONCAT (a.eventcalendarname, ' Shifts Today') as 'Metric',
+		COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.event_attendees_live as a 
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep
+			on rep.days = a.eventdate
+		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as c
+			on c.vanid = a.myc_vanid
+	WHERE a.eventdate = CURRENT_DATE
+		AND a.committeeid = 59691
+		AND a.eventcalendarname IN ('Canvass', 'Phone Banks')
+        AND a.RSVP IS NOT NULL
+        AND c.foname IS NOT NULL
+        AND a.closed IS NULL
+	GROUP BY 1,2,3,4
+UNION
 --Volunteer Turnout Rate
 SELECT c.regionname, c.foname, 
 		CURRENT_DATE as 'Reporting Week',
@@ -203,12 +230,13 @@ WHERE a.RSVP IS NOT NULL
 	AND a.eventdate BETWEEN CURRENT_DATE - INTERVAL '40 DAYS' and CURRENT_DATE - INTERVAL '1 Days'
 	AND a.committeeid = 59691
 	AND a.eventcalendarname IN ('Canvass', 'Phone Banks')
+	AND c.foname IS NOT NULL
 GROUP BY 1,2,3,4
 UNION
---Canvass shifts completed
+--DVC Shifts Completed
 SELECT c.regionname, c.foname, 
 		DATE (rep.reporting_week) as 'Reporting Week', 
-		'Canvass Shifts Completed' as 'Metric',
+		CONCAT (a.eventcalendarname, ' Shifts Completed') as 'Metric',
 		COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.event_attendees_live as a 
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
@@ -217,9 +245,27 @@ SELECT c.regionname, c.foname,
 			on c.vanid = a.myc_vanid
 	WHERE a.attended = 1
 		AND a.committeeid = 59691
-		AND a.eventcalendarname LIKE 'Canvass'
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks')
 		AND YEAR (a.eventdate) = 2018
-	GROUP BY 1,2,3
+		AND c.foname IS NOT NULL
+	GROUP BY 1,2,3,4
+UNION
+--DVC Shifts Completed Yesterday
+SELECT c.regionname, c.foname, 
+		DATE (rep.reporting_week) as 'Reporting Week', 
+		CONCAT (a.eventcalendarname, ' Shifts Completed') as 'Metric',
+		COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.event_attendees_live as a 
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
+			on rep.days = a.eventdate 
+		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as c
+			on c.vanid = a.myc_vanid
+	WHERE a.attended = 1
+		AND a.committeeid = 59691
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks')
+		AND a.eventdate = CURRENT_DATE - INTERVAL '1 Days'
+		AND c.foname IS NOT NULL
+	GROUP BY 1,2,3,4
 UNION
 --Trained Hosts never active
 SELECT c.regionname, c.foname, 
@@ -244,6 +290,7 @@ WHERE a.committeeid = 59691
 	AND a.eventcalendarname LIKE 'Training'
 	AND a.attended = 1
 	AND sub1.myc_vanid IS NULL
+	AND c.foname IS NOT NULL
 GROUP BY 1,2,3,4
 -- Host Conveyer Belt
 UNION       
@@ -269,6 +316,7 @@ SELECT b.regionname, b.foname,
             on sub.myc_vanid = b.vanid
         LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
             on rep.days = CURRENT_DATE 
+        WHERE b.foname IS NOT NULL
         GROUP BY 1,2,3,4
 UNION
  --Vol Rec Calls Yesterday	
@@ -284,6 +332,7 @@ SELECT b.regionname, b.foname,
 	WHERE con.committeeid = 59691
 		AND con.call_attempt = 1
 		AND con.datecanvassed = CURRENT_DATE - INTERVAL '1 days'
+		AND b.foname IS NOT NULL
 	GROUP BY 1,2,3,4
 UNION
 --Vol Turnout this Week      
@@ -300,5 +349,6 @@ WHERE a.RSVP IS NOT NULL
 	AND a.committeeid = 59691
 	AND rep.reporting_week BETWEEN CURRENT_DATE - INTERVAL '7 days' AND CURRENT_DATE - INTERVAL '1 days'
 	AND a.eventcalendarname IN ('Canvass', 'Phone Banks')
+	AND c.foname IS NOT NULL
 GROUP BY 1,2,3,4
-) as sub
+) as sub;
