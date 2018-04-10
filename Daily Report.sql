@@ -88,6 +88,7 @@ UNION
 		AND con.contacttype_name LIKE 'Walk'
 		AND con.successful_contact = 1
 	GROUP BY 1,2,3,4,5
+UNION
 --Active Volunteers		
 	SELECT 	b.regionname, b.foname, 
 			DATE (rep.reporting_week) as 'Reporting Week',
