@@ -71,6 +71,23 @@ UNION
 		AND con.contacttype_name LIKE 'Walk'
 	GROUP BY 1,2,3,4,5
 UNION
+--Walk Contacts	
+	SELECT 	b.regionname, b.foname, 
+			DATE (rep.reporting_week) as 'Reporting Week',
+			'Walk Contacts' as 'Metric',
+			NULL as 'Event Type',
+			COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
+	LEFT JOIN org_sp_wa_vansync_live.dnc_turf as b 	
+			on con.precinctid = b.precinctid
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
+			on rep.days = con.datecanvassed	
+	WHERE con.committeeid = 59691
+		AND YEAR (con.datecanvassed) = 2018
+		AND b.committeeid = 59691
+		AND con.contacttype_name LIKE 'Walk'
+		AND con.successful_contact = 1
+	GROUP BY 1,2,3,4,5
 --Active Volunteers		
 	SELECT 	b.regionname, b.foname, 
 			DATE (rep.reporting_week) as 'Reporting Week',
