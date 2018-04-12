@@ -266,7 +266,7 @@ UNION
 --DVC Shifts Completed By Week
 SELECT c.regionname, c.foname, 
 		DATE (rep.reporting_week) as 'Reporting Week', 
-		'DVC Shifts Completed' as 'Metric',
+		'Shifts Completed' as 'Metric',
 		a.eventcalendarname as 'Event Type',
 		COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.event_attendees_live as a 
