@@ -276,7 +276,7 @@ SELECT c.regionname, c.foname,
 			on c.vanid = a.myc_vanid
 	WHERE a.attended = 1
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks')
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1')
 		AND YEAR (a.eventdate) = 2018
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5 
@@ -294,7 +294,7 @@ SELECT c.regionname, c.foname,
 			on c.vanid = a.myc_vanid
 	WHERE a.attended = 1
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks')
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks', '1:1')
 		AND a.eventdate = CURRENT_DATE - INTERVAL '1 Days'
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5
