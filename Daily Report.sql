@@ -187,7 +187,7 @@ UNION
 			on c.vanid = a.myc_vanid
 	WHERE a.RSVP_date > CURRENT_DATE - INTERVAL '30 Days'
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training', 'Meeting','1:1')
+		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training', 'Meeting','1:1''s')
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5
 UNION	
@@ -204,7 +204,7 @@ UNION
 			on c.vanid = a.myc_vanid
 	WHERE a.RSVP_date = CURRENT_DATE - INTERVAL '1 Days'
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training','Meeting','1:1')
+		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training','Meeting','1:1''s')
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5	
 UNION	
@@ -221,7 +221,7 @@ UNION
 			on c.vanid = a.myc_vanid
 	WHERE a.eventdate BETWEEN CURRENT_DATE AND  CURRENT_DATE + INTERVAL '20 Days'
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training','Meeting','1:1')
+		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', 'In Person Training','Meeting','1:1''s')
         AND a.RSVP IS NOT NULL
         AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5	
@@ -239,7 +239,7 @@ UNION
 			on c.vanid = a.myc_vanid
 	WHERE a.eventdate = CURRENT_DATE
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', '1:1')
+		AND a.eventcalendarname IN ('Canvass', 'Phone Banks', '1:1''s')
         AND a.RSVP IS NOT NULL
         AND c.foname IS NOT NULL
         AND a.closed IS NULL
@@ -276,7 +276,7 @@ SELECT c.regionname, c.foname,
 			on c.vanid = a.myc_vanid
 	WHERE a.attended = 1
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1')
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1''s')
 		AND YEAR (a.eventdate) = 2018
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5 
@@ -294,7 +294,7 @@ SELECT c.regionname, c.foname,
 			on c.vanid = a.myc_vanid
 	WHERE a.attended = 1
 		AND a.committeeid = 59691
-		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks', '1:1')
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks', '1:1''s')
 		AND a.eventdate = CURRENT_DATE - INTERVAL '1 Days'
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5
