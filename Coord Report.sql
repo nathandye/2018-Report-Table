@@ -1,7 +1,7 @@
-DROP TABLE sp_wa_dyen.report_data;
+DROP TABLE IF EXISTS sp_wa_dyen.coord_report_data;
 
 SELECT *
-INTO sp_wa_dyen.report_data
+INTO sp_wa_dyen.coord_report_data
 FROM (
 
 --Walk Attempts	
@@ -230,7 +230,7 @@ SELECT c.regionname, c.foname,
 	WHERE a.attended = 1
 		AND a.committeeid = 59691
 		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
-		AND DATE (con.datecanvassed) >= '2018-06-01'
+		AND DATE (a.eventdate) >= '2018-06-01'
 		AND c.foname IS NOT NULL
 	GROUP BY 1,2,3,4,5 
 UNION
