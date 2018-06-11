@@ -8,7 +8,6 @@ FROM (
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'Walk Attempts' as 'Metric',
-			CASE WHEN sta.id IS NOT NULL THEN 'x' ELSE NULL END as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
 	LEFT JOIN org_sp_wa_vansync_live.dnc_turf as b 	
@@ -21,13 +20,12 @@ FROM (
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Walk'
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --Walk Contacts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'Walk Contacts' as 'Metric',
-			CASE WHEN sta.id IS NOT NULL THEN 'x' ELSE NULL END as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
 	LEFT JOIN org_sp_wa_vansync_live.dnc_turf as b 	
@@ -41,13 +39,12 @@ UNION
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Walk'
 		AND con.successful_contact = 1
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Phone Attempts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'DVC Phone Attempts' as 'Metric',
-			CASE WHEN sta.id IS NOT NULL THEN 'x' ELSE NULL END as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
 	LEFT JOIN org_sp_wa_vansync_live.dnc_turf as b 	
@@ -60,13 +57,12 @@ UNION
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Phone'
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Phone Contacts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'DVC Phone Contacts' as 'Metric',
-			CASE WHEN sta.id IS NOT NULL THEN 'x' ELSE NULL END as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
 	LEFT JOIN org_sp_wa_vansync_live.dnc_turf as b 	
@@ -80,13 +76,12 @@ UNION
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Phone'
 		AND con.successful_contact = 1
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --Active Volunteers		
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'Active Vols' as 'Metric',
-			NULL as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM (SELECT DISTINCT (eve.myc_vanid) as 'myc_vanid'
 			FROM org_sp_wa_vansync_live.event_attendees_live as eve
@@ -108,7 +103,6 @@ Union
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'Lapsed Vols' as 'Metric',
-			NULL as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM (SELECT DISTINCT (eve.myc_vanid) as 'myc_vanid'
 			FROM org_sp_wa_vansync_live.event_attendees_live as eve
@@ -139,8 +133,7 @@ UNION
 --Vol Rec Calls	
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
-			'Vol Rec Calls' as 'Metric',
-			CASE WHEN sta.id IS NOT NULL THEN 'x' ELSE NULL END as 'staff vs vol',
+			'Vol Rec Attempts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_myc_live as con 
 		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as b 
@@ -155,13 +148,12 @@ UNION
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND con.call_attempt = 1
 		AND b.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --Vol Rec Contacts	
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'Vol Rec Contacts' as 'Metric',
-			CASE WHEN sta.id IS NOT NULL THEN 'x' ELSE NULL END as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_myc_live as con 
 		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as b 
@@ -177,13 +169,12 @@ UNION
 		AND con.successful_contact = 1
 		AND con.call_attempt = 1
 		AND b.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 -- Host Conveyer Belt
 SELECT b.regionname, b.foname, ld.ld as 'LD', 
             DATE (rep.reporting_week)as 'Reporting Week',
             sub.active_type as 'Metric',
-			NULL as 'staff vs vol',
             COUNT (*) as 'progress'
     FROM (SELECT DISTINCT (eve.myc_vanid) as 'myc_vanid',
                 CASE WHEN MAX (eve.eventdate) >= CURRENT_DATE - INTERVAL '7 Days' THEN 'Vol Activity 1 Week Ago'
@@ -205,13 +196,12 @@ SELECT b.regionname, b.foname, ld.ld as 'LD',
         LEFT JOIN sp_wa_dyen.turf_to_ld as ld
 	              on ld.teamname = b.teamname
         WHERE b.foname IS NOT NULL
-        GROUP BY 1,2,3,4,5,6 
+        GROUP BY 1,2,3,4,5
 UNION 
  --Vol Rec Calls Yesterday	
 SELECT b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
 			'Vol Rec Calls Yesterday' as 'Metric',
-			NULL as 'staff vs vol',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_myc_live as con 
 	LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as b 
@@ -224,7 +214,7 @@ SELECT b.regionname, b.foname, ld.ld as 'LD',
 		AND con.call_attempt = 1
 		AND con.datecanvassed = CURRENT_DATE - INTERVAL '1 days'
 		AND b.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION	
 -- Shifts Completed By Week
 SELECT c.regionname, c.foname, ld.ld as 'LD', 
@@ -232,7 +222,6 @@ SELECT c.regionname, c.foname, ld.ld as 'LD',
 		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Completed'
 		     WHEN a.eventcalendarname LIKE 'Phone Banks' THEN 'DVC Phonebank Shifts Completed'
 			ELSE CONCAT (a.eventcalendarname, ' Shifts Completed') END as 'Metric',
-		NULL as 'staff vs vol',
 		COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.event_attendees_live as a 
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
@@ -246,7 +235,7 @@ SELECT c.regionname, c.foname, ld.ld as 'LD',
 		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
 		AND DATE (a.eventdate) >= '2018-06-01'
 		AND c.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6 
+	GROUP BY 1,2,3,4,5
 UNION
 -- Shifts Completed Yesterday
 SELECT c.regionname, c.foname, ld.ld as 'LD', 
@@ -254,7 +243,6 @@ SELECT c.regionname, c.foname, ld.ld as 'LD',
 		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Completed Yesterday'
 		     WHEN a.eventcalendarname LIKE 'Phone Banks' THEN 'DVC Phonebank Shifts Completed Yesterday'
 			ELSE CONCAT (a.eventcalendarname, ' Shifts Completed Yesterday') END as 'Metric',
-		NULL as 'staff vs vol',
 		COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.event_attendees_live as a 
 		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
@@ -268,7 +256,90 @@ SELECT c.regionname, c.foname, ld.ld as 'LD',
 		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
 		AND a.eventdate = CURRENT_DATE - INTERVAL '1 Days'
 		AND c.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
+UNION	
+-- Shifts Scheduled
+SELECT c.regionname, c.foname, ld.ld as 'LD', 
+		DATE (rep.reporting_week) as 'Reporting Week', 
+		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Scheduled'
+		     WHEN a.eventcalendarname LIKE 'Phone Banks' THEN 'DVC Phonebank Shifts Scheduled'
+			ELSE CONCAT (a.eventcalendarname, ' Shifts Scheduled') END as 'Metric',
+		COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.event_attendees_live as a 
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
+			on rep.days = a.eventdate 
+		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as c
+			on c.vanid = a.myc_vanid
+		LEFT JOIN sp_wa_dyen.turf_to_ld as ld
+	              on ld.teamname = c.teamname
+	WHERE  a.committeeid = 59691
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
+		AND DATE (a.RSVP_date) >= CURRENT_DATE - INTERVAL '14 Days'
+		AND c.foname IS NOT NULL
+	GROUP BY 1,2,3,4,5
+UNION		
+-- Shifts Scheduled Yesterday
+SELECT c.regionname, c.foname, ld.ld as 'LD', 
+		DATE (rep.reporting_week) as 'Reporting Week', 
+		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Scheduled Yesterday'
+		     WHEN a.eventcalendarname LIKE 'Phone Banks' THEN 'DVC Phonebank Shifts Scheduled Yesterday'
+			ELSE CONCAT (a.eventcalendarname, ' Shifts Scheduled Yesterday') END as 'Metric',
+		COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.event_attendees_live as a 
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
+			on rep.days = a.eventdate 
+		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as c
+			on c.vanid = a.myc_vanid
+		LEFT JOIN sp_wa_dyen.turf_to_ld as ld
+	              on ld.teamname = c.teamname
+	WHERE a.committeeid = 59691
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
+		AND DATE (a.RSVP_date) = CURRENT_DATE - INTERVAL '1 Days'
+		AND c.foname IS NOT NULL
+	GROUP BY 1,2,3,4,5
+UNION
+-- Shifts Coming In Today
+SELECT c.regionname, c.foname, ld.ld as 'LD', 
+		DATE (rep.reporting_week) as 'Reporting Week', 
+		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Today'
+		     WHEN a.eventcalendarname LIKE 'Phone Banks' THEN 'DVC Phonebank Shifts Today'
+			ELSE CONCAT (a.eventcalendarname, ' Shifts Scheduled Today') END as 'Metric',
+		COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.event_attendees_live as a 
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
+			on rep.days = a.eventdate 
+		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as c
+			on c.vanid = a.myc_vanid
+		LEFT JOIN sp_wa_dyen.turf_to_ld as ld
+	              on ld.teamname = c.teamname
+	WHERE (a.RSVP IS NOT NULL OR a.confirmed IS NOT NULL)
+		AND a.committeeid = 59691
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
+		AND a.eventdate = CURRENT_DATE
+		AND c.foname IS NOT NULL
+	GROUP BY 1,2,3,4,5	
+UNION
+-- Shifts Coming In Tomorrow
+SELECT c.regionname, c.foname, ld.ld as 'LD', 
+		DATE (rep.reporting_week) as 'Reporting Week', 
+		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Tomorrow'
+		     WHEN a.eventcalendarname LIKE 'Phone Banks' THEN 'DVC Phonebank Shifts Tomorrow'
+			ELSE CONCAT (a.eventcalendarname, ' Shifts Tomorrow') END as 'Metric',
+		COUNT (*) as 'progress'
+	FROM org_sp_wa_vansync_live.event_attendees_live as a 
+		LEFT JOIN sp_wa_dyen.reporting_weeks as rep 
+			on rep.days = a.eventdate 
+		LEFT JOIN org_sp_wa_vansync_live.dnc_activityregions as c
+			on c.vanid = a.myc_vanid
+		LEFT JOIN sp_wa_dyen.turf_to_ld as ld
+	              on ld.teamname = c.teamname
+	WHERE (a.RSVP IS NOT NULL OR a.confirmed IS NOT NULL)
+		AND a.committeeid = 59691
+		AND a.eventcalendarname IN  ('Canvass', 'Phone Banks','1:1s','Vol Recruitment')
+		AND a.eventdate = CURRENT_DATE + INTERVAL '1 Days'
+		AND c.foname IS NOT NULL
+	GROUP BY 1,2,3,4,5		
 	
 ) as sub;
+
 
