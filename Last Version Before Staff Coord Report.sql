@@ -5,9 +5,8 @@ INTO sp_wa_dyen.coord_report_data
 FROM (
 
 --Walk Attempts	
-	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD', 
+	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'Walk Attempts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
@@ -21,13 +20,11 @@ FROM (
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Walk'
-	GROUP BY 1,2,3,4,5,6
-	
+	GROUP BY 1,2,3,4,5
 UNION
 --Walk Contacts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'Walk Contacts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
@@ -42,12 +39,11 @@ UNION
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Walk'
 		AND con.successful_contact = 1
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Phone Attempts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'DVC Phone Attempts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
@@ -61,12 +57,11 @@ UNION
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Phone'
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Phone Contacts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'DVC Phone Contacts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
@@ -81,12 +76,11 @@ UNION
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Phone'
 		AND con.successful_contact = 1
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Text Attempts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'DVC Texts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
@@ -100,12 +94,11 @@ UNION
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND b.committeeid = 59691
 		AND con.contacttype_name LIKE 'Text'
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Text + Call Attempts	
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'DVC Texts + Call Attempts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_voter_live as con 
@@ -119,12 +112,11 @@ UNION
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND b.committeeid = 59691
 		AND con.contacttype_name IN ('Text','Phone')
-	GROUP BY 1,2,3,4,5,6	
+	GROUP BY 1,2,3,4,5	
 UNION
 --Active Volunteers		
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
-			NULL as 'Staff or Vol',
 			'Active Vols' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM (SELECT DISTINCT (eve.myc_vanid) as 'myc_vanid'
@@ -141,12 +133,11 @@ UNION
 	       LEFT JOIN sp_wa_dyen.turf_to_ld as ld
 	               on ld.teamname = b.teamname
 		WHERE b.foname IS NOT NULL
-		GROUP BY 1,2,3,4,5,6
+		GROUP BY 1,2,3,4
 Union
 -- Lapsed Vols
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
-			NULL as 'Staff or Vol',
 			'Lapsed Vols' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM (SELECT DISTINCT (eve.myc_vanid) as 'myc_vanid'
@@ -173,12 +164,11 @@ Union
 	               on ld.teamname = b.teamname
 		WHERE sub2.myc_vanid IS NULL
 			AND b.foname IS NOT NULL
-		GROUP BY 1,2,3,4,5,6		
+		GROUP BY 1,2,3,4		
 UNION 
 --Vol Rec Calls	
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'Vol Rec Attempts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_myc_live as con 
@@ -194,12 +184,11 @@ UNION
 		AND DATE (con.datecanvassed) >= '2018-06-01'
 		AND con.call_attempt = 1
 		AND b.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4
 UNION
 --Vol Rec Contacts	
 	SELECT 	b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'Vol Rec Contacts' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_myc_live as con 
@@ -216,12 +205,11 @@ UNION
 		AND con.successful_contact = 1
 		AND con.call_attempt = 1
 		AND b.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 -- Host Conveyer Belt
 SELECT b.regionname, b.foname, ld.ld as 'LD', 
             DATE (rep.reporting_week)as 'Reporting Week',
-            NULL as 'Staff or Vol',
             sub.active_type as 'Metric',
             COUNT (*) as 'progress'
     FROM (SELECT DISTINCT (eve.myc_vanid) as 'myc_vanid',
@@ -244,12 +232,11 @@ SELECT b.regionname, b.foname, ld.ld as 'LD',
         LEFT JOIN sp_wa_dyen.turf_to_ld as ld
 	              on ld.teamname = b.teamname
         WHERE b.foname IS NOT NULL
-        GROUP BY 1,2,3,4,5,6
+        GROUP BY 1,2,3,4,5
 UNION 
  --Vol Rec Calls Yesterday	
 SELECT b.regionname, b.foname, ld.ld as 'LD', 
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			'Vol Rec Calls Yesterday' as 'Metric',
 			COUNT (*) as 'progress'
 	FROM org_sp_wa_vansync_live.contacts_myc_live as con 
@@ -259,18 +246,15 @@ SELECT b.regionname, b.foname, ld.ld as 'LD',
 			on rep.days = con.datecanvassed	
 	LEFT JOIN sp_wa_dyen.turf_to_ld as ld
 	              on ld.teamname = b.teamname
-        LEFT JOIN sp_wa_dyen.fo_user_ids as sta 
-		      on sta.id = con.canvasserid	
 	WHERE con.committeeid = 59691
 		AND con.call_attempt = 1
 		AND con.datecanvassed = CURRENT_DATE - INTERVAL '1 days'
 		AND b.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 --DVC Attempts Yesterday
 	SELECT 	b.regionname, b.foname, CAST (con.state_senate_district_latest as INT) as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			sta.title as 'Staff or Vol',
 			CASE WHEN con.contacttype_name LIKE 'Phone' THEN 'DVC Phone Attempts Yesterday'
 			     WHEN con.contacttype_name LIKE 'Walk' THEN 'Walk Attempts Yesterday'
 			     WHEN con.contacttype_name LIKE 'Text' THEN 'DVC Texts Yesterday'
@@ -287,12 +271,11 @@ UNION
 		AND DATE (con.datecanvassed) = CURRENT_DATE - INTERVAL '1 Days'
 		AND b.committeeid = 59691
 		AND con.contacttype_name IN ('Walk','Phone','Text')
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION	
 -- Shifts Completed By Week
 SELECT c.regionname, c.foname, ld.ld as 'LD', 
 		DATE (rep.reporting_week) as 'Reporting Week', 
-		NULL as 'Staff or Vol',
 		CASE WHEN a.eventcalendarname LIKE '1:1s' THEN '1:1s Completed'
 		     WHEN a.eventcalendarname LIKE 'DVC Phone Banks' THEN 'DVC Phonebank Shifts Completed'
 		     WHEN a.eventcalendarname LIKE 'Vol Rec Phone Banks' THEN 'Vol Recruitment Shifts Completed'
@@ -312,12 +295,11 @@ SELECT c.regionname, c.foname, ld.ld as 'LD',
 		AND a.eventcalendarname IN  ('Canvass', 'DVC Phone Banks','1:1s','Vol Rec Phone Banks')
 		AND DATE (a.eventdate) >= '2018-06-01'
 		AND c.foname IS NOT NULL
-	GROUP BY 1,2,3,4,5,6
+	GROUP BY 1,2,3,4,5
 UNION
 -- CTM Progress Weekly
      SELECT b.regionname, b.foname, ld.ld as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			NULL as 'Staff or Vol',
 			CASE 
 			     WHEN respons.surveyresponseid = 1238934 THEN 'CTM Prospect This Week'
                              WHEN respons.surveyresponseid = 1238935 THEN 'CTM Testing This Week'
@@ -339,12 +321,11 @@ UNION
      WHERE res.committeeid = 59691
                 AND res.surveyquestionid = 299092
                 AND res.sq_currency = 1
-     GROUP BY 1,2,3,4,5,6			
+     GROUP BY 1,2,3,4,5			
 UNION
 -- Cumulative CTM Progress Weekly
      SELECT b.regionname, b.foname, ld.ld as 'LD',
 			current_date as 'Reporting Week',
-			NULL as 'Staff or Vol',
 			CASE 
 			     WHEN respons.surveyresponseid = 1238934 THEN 'Current CTM Prospects'
                              WHEN respons.surveyresponseid = 1238935 THEN 'Current CTM In Testing'
@@ -368,12 +349,11 @@ UNION
      WHERE res.committeeid = 59691
                 AND res.surveyquestionid = 299092
                 AND res.sq_currency = 1
-     GROUP BY 1,2,3,4,5,6
+     GROUP BY 1,2,3,4,5	
 UNION
        -- NTL Progress Weekly
      SELECT b.regionname, b.foname, ld.ld as 'LD',
 			DATE (rep.reporting_week) as 'Reporting Week',
-			NULL as 'Staff or Vol',
 			CASE 
 			     WHEN respons.surveyresponseid = 1280286 THEN 'NTL Prospect This Week'
                              WHEN respons.surveyresponseid = 1280287 THEN 'NTL Testing This Week'
@@ -395,12 +375,11 @@ UNION
      WHERE res.committeeid = 59691
                 AND res.surveyquestionid = 309589
                 AND res.sq_currency = 1
-     GROUP BY 1,2,3,4,5,6			
+     GROUP BY 1,2,3,4,5			
 UNION
 -- Cumulative NTL Progress Weekly
      SELECT b.regionname, b.foname, ld.ld as 'LD',
 			current_date as 'Reporting Week',
-			NULL as 'Staff or Vol',
 			CASE 
 			     WHEN respons.surveyresponseid = 1280286 THEN 'Current NTL Prospects'
                              WHEN respons.surveyresponseid = 1280287 THEN 'Current NTL In Testing'
@@ -420,5 +399,5 @@ UNION
      WHERE res.committeeid = 59691
                 AND res.surveyquestionid = 309589
                 AND res.sq_currency = 1
-     GROUP BY 1,2,3,4,5,6					
+     GROUP BY 1,2,3,4,5					
 ) as sub;
